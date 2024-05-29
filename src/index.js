@@ -34,6 +34,7 @@ const html = todos => `
 
 		const updateTodos = function() {
 			fetch('/', {method: 'PUT', body: JSON.stringify({todos: window.todos})});
+			populateTodos();
 		};
 
 		const toggleCheckbox = function(evt) {
