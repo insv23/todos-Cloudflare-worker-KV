@@ -115,14 +115,17 @@ export default {
 			]
 		};
 
-		const setCache = data => env.TODOS.put('data', data);
-		const getCache = () => env.TODOS.get('data');
+		const setCache = (key, data) => env.TODOS.put(key, data);
+		const getCache = (key) => env.TODOS.get(key);
+
+		const ip = request.headers.get('CF-Connecting-IP');
+		const myKey = `data-${ip}`;
 
 		if (request.method === 'PUT') {
 			const body = await request.text();
 			try {
 				JSON.parse(body)
-				await setCache(body)
+				await setCache(myKey, body);
 				return new Response(body, {status: 200})
 			} catch (err) {
 				return new Response(err, {status: 500})
@@ -130,9 +133,9 @@ export default {
 		}
 
 		let data;
-		const cache = await getCache();
+		const cache = await getCache(myKey);
 		if (!cache) {
-			await setCache(JSON.stringify(defaultData));
+			await setCache(myKey, JSON.stringify(defaultData));
 			data = defaultData;
 		} else {
 			data = JSON.parse(cache);
